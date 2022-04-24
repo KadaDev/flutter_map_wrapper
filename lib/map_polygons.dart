@@ -2,21 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_wrapper/models/map_polygon.dart';
 
-class PolygonWithExtra<T> extends Polygon {
-  PolygonWithExtra({
-    required this.extra,
-    required super.points,
-    super.borderColor,
-    super.borderStrokeWidth,
-    super.color,
-    super.disableHolesBorder,
-    super.holePointsList,
-    super.isDotted,
-  });
-
-  final T extra;
-}
-
 class MapPolygons<T> extends StatelessWidget {
   const MapPolygons({
     Key? key,
