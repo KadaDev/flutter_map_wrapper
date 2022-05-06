@@ -34,8 +34,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeData = ThemeData.from(
-      colorScheme: const ColorScheme.light(),
+    final baseTheme = ThemeData.from(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.lightGreen,
+      ),
+    );
+    final themeData = baseTheme.copyWith(
+      splashColor: baseTheme.colorScheme.primary.withAlpha(0x66),
     );
     return MaterialApp(
       title: 'Flutter Demo',
@@ -62,14 +67,14 @@ class _MyHomePageState extends State<MyHomePage> {
     _getPermission();
   }
 
-  final List<MapStyle> mapStyles = [
-    const MapStyle(
+  static const List<MapStyle> mapStyles = [
+    MapStyle(
       title: 'Terrain map',
       urlTemplate: '${MyHomePage.ifiskeMap}/{z}/{x}/{y}.png',
       maxZoom: 20,
       maxNativeZoom: 15,
     ),
-    const MapStyle(
+    MapStyle(
       title: 'Open Street Map',
       urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       subdomains: ['a', 'b', 'c'],
@@ -119,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
           centerOnLocationUpdate: CenterOnLocationUpdate.once,
           initialZoomLevel: 12,
         ),
+        localizations: const FlutterMapWrapperLocalizations(),
         markers: MapMarkers(
           markers: points,
           markerBuilder: (context, point) {

@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_wrapper/animate_in_from_bottom.dart';
+import 'package:flutter_map_wrapper/localizations.dart';
 import 'package:flutter_map_wrapper/map_markers.dart';
 import 'package:flutter_map_wrapper/map_polygons.dart';
+import 'package:flutter_map_wrapper/map_style_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
 
@@ -62,8 +64,11 @@ class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
     this.polygons,
     this.detailsPanelBuilder,
     this.userLocationOptions,
+    this.localizations = const FlutterMapWrapperLocalizations(),
   })  : assert(mapStyles.isNotEmpty),
         super(key: key);
+
+  final FlutterMapWrapperLocalizations localizations;
 
   final List<MapStyle> mapStyles;
 
@@ -79,7 +84,6 @@ class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
 
   final Widget Function(BuildContext, MapPoint<PointDataType>)?
       detailsPanelBuilder;
-
   @override
   MapWidgetState<PointDataType, PolygonDataType> createState() =>
       MapWidgetState<PointDataType, PolygonDataType>();
@@ -87,8 +91,8 @@ class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
 
 class MapWidgetState<PointDataType, PolygonDataType>
     extends State<MapWidget<PointDataType, PolygonDataType>> {
-  int mapStyleIndex = 0;
-  MapStyle get selectedStyle => widget.mapStyles[mapStyleIndex];
+  final ValueNotifier<int> mapStyleIndex = ValueNotifier(0);
+  MapStyle get selectedStyle => widget.mapStyles[mapStyleIndex.value];
 
   ValueNotifier<MapPoint<PointDataType>?> selectedPoint = ValueNotifier(null);
 
@@ -105,6 +109,10 @@ class MapWidgetState<PointDataType, PolygonDataType>
   @override
   void initState() {
     super.initState();
+
+    mapStyleIndex.addListener(() {
+      setState(() {});
+    });
 
     _centerCurrentLocationStreamController = StreamController<double?>();
 
@@ -149,11 +157,28 @@ class MapWidgetState<PointDataType, PolygonDataType>
   }
 
   void _onMapCreated(MapController controller) async {
-    print("OnMapCreated");
     await controller.onReady;
     widget.onSetZoom?.call(
       CenterZoom(center: controller.center, zoom: controller.zoom),
     );
+  }
+
+  void _onUserLocationButtonPressed() {
+    // TODO: if we don't have permissions, show permissions snackbar
+
+    // Automatically center the location marker on the map when
+    // location updated until user interact with the map.
+    if (_centerOnLocationUpdate != CenterOnLocationUpdate.always) {
+      setState(() {
+        _centerOnLocationUpdate = CenterOnLocationUpdate.always;
+      });
+    }
+    // Center the location marker on the map and zoom the map
+    if (widget.userLocationOptions != null) {
+      _centerCurrentLocationStreamController.add(
+        widget.userLocationOptions!.buttonZoomLevel,
+      );
+    }
   }
 
   @override
@@ -193,95 +218,152 @@ class MapWidgetState<PointDataType, PolygonDataType>
 
     final userLocationOptions = widget.userLocationOptions;
 
-    return RepaintBoundary(
-      child: Stack(
-        children: [
-          FlutterMap(
-            options: mapOptions,
-            children: [
-              TileLayerWidget(
-                options: selectedStyle.tileLayerOptions(context),
-              ),
-              if (widget.userLocationOptions != null)
-                LocationMarkerLayerWidget(
-                  plugin: LocationMarkerPlugin(
-                    centerCurrentLocationStream:
-                        _centerCurrentLocationStreamController.stream,
-                    centerOnLocationUpdate: _centerOnLocationUpdate,
-                  ),
-                  options: LocationMarkerLayerOptions(
-                    positionStream: positionStream,
-                  ),
+    return FlutterMapWrapperLocalizationsInherited(
+      localizations: widget.localizations,
+      child: RepaintBoundary(
+        child: Stack(
+          children: [
+            FlutterMap(
+              options: mapOptions,
+              children: [
+                TileLayerWidget(
+                  options: selectedStyle.tileLayerOptions(context),
                 ),
-              if (widget.polygons != null) widget.polygons!,
-              if (widget.markers != null) widget.markers!,
-            ],
-          ),
-          if (userLocationOptions != null)
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Padding(
-                padding: MediaQuery.of(context).padding.add(
-                      const EdgeInsets.all(16.0),
+                if (widget.userLocationOptions != null)
+                  LocationMarkerLayerWidget(
+                    plugin: LocationMarkerPlugin(
+                      centerCurrentLocationStream:
+                          _centerCurrentLocationStreamController.stream,
+                      centerOnLocationUpdate: _centerOnLocationUpdate,
                     ),
-                child: ValueListenableBuilder(
-                  valueListenable: selectedPoint,
-                  builder: (context, point, child) {
-                    if (point != null && widget.detailsPanelBuilder != null) {
-                      return const SizedBox();
-                    }
-                    return child!;
-                  },
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      // TODO: if we don't have permissions, show permissions snackbar
-
-                      // Automatically center the location marker on the map when
-                      // location updated until user interact with the map.
-                      if (_centerOnLocationUpdate !=
-                          CenterOnLocationUpdate.always) {
-                        setState(() {
-                          _centerOnLocationUpdate =
-                              CenterOnLocationUpdate.always;
-                        });
-                      }
-                      // Center the location marker on the map and zoom the map
-                      _centerCurrentLocationStreamController.add(
-                        userLocationOptions.buttonZoomLevel,
-                      );
-                    },
-                    child: Icon(
-                      _getUserLocationFabIcon(context),
+                    options: LocationMarkerLayerOptions(
+                      positionStream: positionStream,
                     ),
                   ),
-                ),
-              ),
+                if (widget.polygons != null) widget.polygons!,
+                if (widget.markers != null) widget.markers!,
+              ],
             ),
-          ValueListenableBuilder(
-            valueListenable: selectedPoint,
-            builder: (context, MapPoint<PointDataType>? point, child) {
-              Widget? content;
-              if (point != null && widget.detailsPanelBuilder != null) {
-                content = widget.detailsPanelBuilder!(context, point);
-              }
-              return Align(
-                alignment: Alignment.bottomCenter,
-                child: AnimateInFromBottom(
-                  child: content,
+            if (widget.mapStyles.length > 1)
+              _MapStyleButton(
+                mapStyles: widget.mapStyles,
+                mapStyleIndex: mapStyleIndex,
+              ),
+            if (userLocationOptions != null)
+              ValueListenableBuilder(
+                valueListenable: selectedPoint,
+                builder: (context, point, child) {
+                  if (point != null && widget.detailsPanelBuilder != null) {
+                    return const SizedBox();
+                  }
+                  return child!;
+                },
+                child: _MapLocationButton(
+                  centerOnLocationUpdate: _centerOnLocationUpdate,
+                  onPressed: _onUserLocationButtonPressed,
                 ),
-              );
-            },
+              ),
+            ValueListenableBuilder(
+              valueListenable: selectedPoint,
+              builder: (context, MapPoint<PointDataType>? point, child) {
+                Widget? content;
+                if (point != null && widget.detailsPanelBuilder != null) {
+                  content = widget.detailsPanelBuilder!(context, point);
+                }
+                return Align(
+                  alignment: Alignment.bottomCenter,
+                  child: AnimateInFromBottom(
+                    child: content,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MapLocationButton extends StatelessWidget {
+  const _MapLocationButton({
+    Key? key,
+    required this.onPressed,
+    required this.centerOnLocationUpdate,
+  }) : super(key: key);
+  final VoidCallback onPressed;
+
+  final CenterOnLocationUpdate centerOnLocationUpdate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: 0,
+      right: 0,
+      child: Padding(
+        padding: MediaQuery.of(context).padding.add(
+              const EdgeInsets.all(16.0),
+            ),
+        child: FloatingActionButton(
+          onPressed: onPressed,
+          child: Icon(
+            _getUserLocationFabIcon(context),
           ),
-        ],
+        ),
       ),
     );
   }
 
   IconData _getUserLocationFabIcon(BuildContext context) {
     // TODO: check for user geolocation permissions, if no permissions use gps_off
-    return _centerOnLocationUpdate == CenterOnLocationUpdate.always
+    return centerOnLocationUpdate == CenterOnLocationUpdate.always
         ? Icons.gps_fixed
         : Icons.gps_not_fixed;
+  }
+}
+
+class _MapStyleButton extends StatelessWidget {
+  const _MapStyleButton({
+    Key? key,
+    required this.mapStyles,
+    required this.mapStyleIndex,
+  }) : super(key: key);
+
+  final List<MapStyle> mapStyles;
+  final ValueNotifier<int> mapStyleIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      right: 0,
+      top: 0,
+      child: Padding(
+        padding: MediaQuery.of(context).padding.add(
+              const EdgeInsets.all(16.0),
+            ),
+        child: FloatingActionButton.small(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          child: const Icon(Icons.layers),
+          onPressed: () {
+            final localizations = context.localizations;
+            showModalBottomSheet(
+              context: context,
+              enableDrag: true,
+              isScrollControlled: true,
+              builder: (context) {
+                return FlutterMapWrapperLocalizationsInherited(
+                  localizations: localizations,
+                  child: MapStylePicker(
+                    mapStyles: mapStyles,
+                    selectedIndex: mapStyleIndex,
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
   }
 }
