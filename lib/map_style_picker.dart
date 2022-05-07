@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_wrapper/cached_tile_provider.dart';
 import 'package:flutter_map_wrapper/localizations.dart';
 import 'package:flutter_map_wrapper/models/map_style.dart';
 import 'package:flutter_map_wrapper/util/inkwell_wrapper.dart';
@@ -93,14 +95,10 @@ class _MapStylePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final previewImageUrl = _template(
-      mapStyle.urlTemplate,
-      {
-        if (mapStyle.subdomains != null) 's': mapStyle.subdomains!.first,
-        'z': '16',
-        'x': '35613',
-        'y': '19593',
-      },
+    final tileLayerOptions = mapStyle.tileLayerOptions(context);
+    final previewImage = const CachedTileProvider().getImage(
+      Coords(35613, 19593)..z = 16,
+      tileLayerOptions,
     );
 
     // TODO: read from theme or something
@@ -126,8 +124,8 @@ class _MapStylePreview extends StatelessWidget {
           Expanded(
             child: SizedBox(
               width: double.infinity,
-              child: CachedNetworkImage(
-                imageUrl: previewImageUrl,
+              child: Image(
+                image: previewImage,
                 fit: BoxFit.cover,
               ),
             ),
@@ -143,27 +141,4 @@ class _MapStylePreview extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Copied from flutter_map
-final _templateRe = RegExp(r'\{ *([\w_-]+) *\}');
-
-/// Replaces the templating placeholders with the provided data map.
-///
-/// Example input: https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
-///
-/// Throws an [Exception] if any placeholder remains unresolved.
-String _template(String str, Map<String, String> data) {
-  return str.replaceAllMapped(_templateRe, (Match match) {
-    var firstMatch = match.group(1);
-    if (firstMatch == null) {
-      throw Exception('incorrect URL template: $str');
-    }
-    var value = data[firstMatch];
-    if (value == null) {
-      throw Exception('No value provided for variable ${match.group(1)}');
-    } else {
-      return value;
-    }
-  });
 }
