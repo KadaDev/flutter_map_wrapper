@@ -15,15 +15,15 @@ dependencies:
 
   flutter_map:
     git:
-      url: git@github.com:KadaDev/flutter_map.git
+      url: https://github.com/KadaDev/flutter_map.git
       ref: master
   flutter_map_location_marker:
     git:
-      url: git@github.com:KadaDev/flutter_map_location_marker.git
+      url: https://github.com/KadaDev/flutter_map_location_marker.git
       ref: master
   flutter_map_marker_cluster:
     git:
-      url: git@github.com:KadaDev/flutter_map_marker_cluster.git
+      url: https://github.com/KadaDev/flutter_map_marker_cluster.git
       ref: master
   latlong2: ^0.8.1
   geolocator: ^8.2.0
