@@ -2,6 +2,8 @@ name: flutter_map_wrapper
 description: A new Flutter package project.
 version: 0.0.1
 
+publish_to: none
+
 environment:
   sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.17.0"
@@ -11,22 +13,25 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_map: ^0.14.0
-  flutter_map_marker_cluster: ^0.4.4
+  flutter_map:
+    git:
+      url: git@github.com:KadaDev/flutter_map.git
+      ref: master
+  flutter_map_location_marker:
+    git:
+      url: git@github.com:KadaDev/flutter_map_location_marker.git
+      ref: master
+  flutter_map_marker_cluster:
+    git:
+      url: git@github.com:KadaDev/flutter_map_marker_cluster.git
+      ref: master
   latlong2: ^0.8.1
-  flutter_map_location_marker: ^3.1.0
   geolocator: ^8.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ">=1.0.0"
-
-dependency_overrides:
-  flutter_map:
-    git:
-      url: git@github.com:fleaflet/flutter_map.git
-      ref: master
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
