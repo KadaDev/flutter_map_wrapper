@@ -10,6 +10,7 @@ class MapStyle {
     this.subdomains,
     this.maxZoom,
     this.minZoom,
+    this.supportsNativeRetinaMode = false,
   });
 
   final String title;
@@ -18,14 +19,19 @@ class MapStyle {
   final double? minZoom;
   final double? maxZoom;
   final List<String>? subdomains;
+  final bool supportsNativeRetinaMode;
 
   TileLayerOptions tileLayerOptions(BuildContext context) {
+    final useRetinaMode = MediaQuery.of(context).devicePixelRatio >= 2;
     return TileLayerOptions(
       urlTemplate: urlTemplate,
       subdomains: subdomains ?? const <String>[],
       maxNativeZoom: maxNativeZoom,
-      retinaMode: MediaQuery.of(context).devicePixelRatio >= 2,
+      retinaMode: supportsNativeRetinaMode ? false : useRetinaMode,
       tileProvider: const CachedTileProvider(),
+      additionalOptions: {
+        'retinaMode': supportsNativeRetinaMode && useRetinaMode ? '@2x' : ''
+      },
       maxZoom: maxZoom ?? 18,
       minZoom: minZoom ?? 0,
     );
