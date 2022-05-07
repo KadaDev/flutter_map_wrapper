@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_wrapper/cached_tile_provider.dart';
@@ -95,12 +94,6 @@ class _MapStylePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tileLayerOptions = mapStyle.tileLayerOptions(context);
-    final previewImage = const CachedTileProvider().getImage(
-      Coords(35613, 19593)..z = 16,
-      tileLayerOptions,
-    );
-
     // TODO: read from theme or something
     final BorderRadius borderRadius = BorderRadius.circular(8.0);
 
@@ -124,10 +117,7 @@ class _MapStylePreview extends StatelessWidget {
           Expanded(
             child: SizedBox(
               width: double.infinity,
-              child: Image(
-                image: previewImage,
-                fit: BoxFit.cover,
-              ),
+              child: _previewImage(context),
             ),
           ),
           Padding(
@@ -139,6 +129,19 @@ class _MapStylePreview extends StatelessWidget {
       inkWell: InkWell(
         onTap: onSelected,
       ),
+    );
+  }
+
+  Widget _previewImage(BuildContext context) {
+    final tileLayerOptions = mapStyle.tileLayerOptions(context);
+
+    final previewImage = const CachedTileProvider().getImage(
+      Coords(35613, 19593)..z = tileLayerOptions.retinaMode ? 15 : 16,
+      tileLayerOptions,
+    );
+    return Image(
+      image: previewImage,
+      fit: BoxFit.cover,
     );
   }
 }
