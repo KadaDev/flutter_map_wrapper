@@ -305,6 +305,7 @@ class _MapLocationButton extends StatelessWidget {
               const EdgeInsets.all(16.0),
             ),
         child: FloatingActionButton(
+          heroTag: null,
           onPressed: onPressed,
           child: Icon(
             _getUserLocationFabIcon(context),
@@ -342,6 +343,7 @@ class _MapStyleButton extends StatelessWidget {
               const EdgeInsets.all(16.0),
             ),
         child: FloatingActionButton.small(
+          heroTag: null,
           backgroundColor: Theme.of(context).colorScheme.surface,
           foregroundColor: Theme.of(context).colorScheme.onSurface,
           child: const Icon(Icons.layers),
