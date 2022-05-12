@@ -4,11 +4,11 @@ import 'package:flutter_map_wrapper/models/map_polygon.dart';
 
 class MapPolygons<T> extends StatelessWidget {
   const MapPolygons({
-    Key? key,
+    super.key,
     required this.polygons,
     this.onLabelTap,
     this.labelMarkerBuilder,
-  }) : super(key: key);
+  });
 
   final List<MapPolygon<T>> polygons;
   final void Function(MapPolygon<T>)? onLabelTap;

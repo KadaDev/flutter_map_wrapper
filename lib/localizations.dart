@@ -10,13 +10,10 @@ class FlutterMapWrapperLocalizations {
 
 class FlutterMapWrapperLocalizationsInherited extends InheritedWidget {
   const FlutterMapWrapperLocalizationsInherited({
-    Key? key,
-    required Widget child,
+    super.key,
+    required super.child,
     required this.localizations,
-  }) : super(
-          key: key,
-          child: child,
-        );
+  });
 
   final FlutterMapWrapperLocalizations localizations;
 

@@ -2,10 +2,10 @@ import 'package:flutter/widgets.dart';
 
 class MapMarker extends StatelessWidget {
   const MapMarker({
-    Key? key,
+    super.key,
     required this.color,
     this.child,
-  }) : super(key: key);
+  });
 
   final Color color;
   final Widget? child;

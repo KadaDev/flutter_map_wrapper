@@ -20,35 +20,28 @@ class MapPolygon<T> extends Polygon {
   MapPolygon({
     required this.baseColor,
     required this.data,
-    required List<LatLng> points,
-    double borderStrokeWidth = defaultBorderStrokeWidth,
-    List<List<LatLng>>? holePointsList,
-    bool? disableHolesBorder,
-    bool? isDotted,
+    required super.points,
+    super.borderStrokeWidth = defaultBorderStrokeWidth,
+    super.holePointsList,
+    super.disableHolesBorder,
+    super.isDotted,
   }) : super(
           color: baseColor.withAlpha(colorAlpha),
           borderColor: baseColor.withAlpha(borderAlpha),
-          points: points,
-          borderStrokeWidth: borderStrokeWidth,
-          disableHolesBorder: disableHolesBorder ?? false,
-          isDotted: isDotted ?? false,
         );
 
   MapPolygon.fromString({
     required String polygonString,
     required this.baseColor,
     required this.data,
-    double borderStrokeWidth = defaultBorderStrokeWidth,
-    List<List<LatLng>>? holePointsList,
-    bool? disableHolesBorder,
-    bool? isDotted,
+    super.borderStrokeWidth = defaultBorderStrokeWidth,
+    super.holePointsList,
+    super.disableHolesBorder,
+    super.isDotted,
   }) : super(
           points: _getPoints(polygonString),
           color: baseColor.withAlpha(colorAlpha),
           borderColor: baseColor.withAlpha(borderAlpha),
-          borderStrokeWidth: borderStrokeWidth,
-          disableHolesBorder: disableHolesBorder ?? false,
-          isDotted: isDotted ?? false,
         );
 
   final T data;

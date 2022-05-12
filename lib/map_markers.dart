@@ -14,14 +14,14 @@ typedef MarkerBuilder<T extends MapPoint> = Widget Function(BuildContext, T);
 
 class MapMarkers<T> extends StatelessWidget {
   const MapMarkers({
-    Key? key,
+    super.key,
     required this.markers,
     required this.markerBuilder,
     this.clusterMarkerBuilder,
     this.onMarkerTap,
     this.markerSize = 48.0,
     this.maxClusterRadius = 96,
-  }) : super(key: key);
+  });
 
   final List<MapPoint<T>> markers;
   final double markerSize;

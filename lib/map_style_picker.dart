@@ -7,10 +7,10 @@ import 'package:flutter_map_wrapper/util/inkwell_wrapper.dart';
 
 class MapStylePicker extends StatelessWidget {
   const MapStylePicker({
-    Key? key,
+    super.key,
     required this.mapStyles,
     required this.selectedIndex,
-  }) : super(key: key);
+  });
 
   final List<MapStyle> mapStyles;
   final ValueNotifier<int> selectedIndex;
@@ -82,11 +82,10 @@ class MapStylePicker extends StatelessWidget {
 
 class _MapStylePreview extends StatelessWidget {
   const _MapStylePreview({
-    Key? key,
     required this.mapStyle,
     this.selected = false,
     required this.onSelected,
-  }) : super(key: key);
+  });
 
   final MapStyle mapStyle;
   final bool selected;

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class DetailsPanel extends StatelessWidget {
   const DetailsPanel({
-    Key? key,
+    super.key,
     required this.title,
     this.content,
     this.leading,
     this.onTap,
     this.trailing,
     this.margin,
-  }) : super(key: key);
+  });
 
   final Widget title;
   final Widget? leading;

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class MapClusterMarker extends StatelessWidget {
   const MapClusterMarker({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Widget child;
 

@@ -55,7 +55,7 @@ class UserLocationOptions {
 class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
     extends StatefulWidget {
   MapWidget({
-    Key? key,
+    super.key,
     required this.mapStyles,
     this.zoom = const ZoomSettings(),
     this.center,
@@ -65,8 +65,7 @@ class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
     this.detailsPanelBuilder,
     this.userLocationOptions,
     this.localizations = const FlutterMapWrapperLocalizations(),
-  })  : assert(mapStyles.isNotEmpty),
-        super(key: key);
+  }) : assert(mapStyles.isNotEmpty);
 
   final FlutterMapWrapperLocalizations localizations;
 
@@ -287,10 +286,9 @@ class MapWidgetState<PointDataType, PolygonDataType>
 
 class _MapLocationButton extends StatelessWidget {
   const _MapLocationButton({
-    Key? key,
     required this.onPressed,
     required this.centerOnLocationUpdate,
-  }) : super(key: key);
+  });
   final VoidCallback onPressed;
 
   final CenterOnLocationUpdate centerOnLocationUpdate;
@@ -325,10 +323,9 @@ class _MapLocationButton extends StatelessWidget {
 
 class _MapStyleButton extends StatelessWidget {
   const _MapStyleButton({
-    Key? key,
     required this.mapStyles,
     required this.mapStyleIndex,
-  }) : super(key: key);
+  });
 
   final List<MapStyle> mapStyles;
   final ValueNotifier<int> mapStyleIndex;

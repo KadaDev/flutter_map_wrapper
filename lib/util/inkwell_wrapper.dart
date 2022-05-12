@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class InkwellWrapper extends StatelessWidget {
   const InkwellWrapper({
-    Key? key,
+    super.key,
     required this.inkWell,
     required this.child,
     this.shape,
     this.color,
-  }) : super(key: key);
+  });
 
   final Widget inkWell;
   final Widget child;

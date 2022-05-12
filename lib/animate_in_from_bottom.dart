@@ -2,9 +2,9 @@ import 'package:flutter/widgets.dart';
 
 class AnimateInFromBottom extends StatefulWidget {
   const AnimateInFromBottom({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Widget? child;
 
