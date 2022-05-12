@@ -122,8 +122,10 @@ class MapWidgetState<PointDataType, PolygonDataType>
       if (_centerOnLocationUpdate == CenterOnLocationUpdate.always ||
           _centerOnLocationUpdate == CenterOnLocationUpdate.once) {
         positionStream.first.then((value) {
-          _centerCurrentLocationStreamController
-              .add(userLocationOptions.initialZoomLevel);
+          if (!_centerCurrentLocationStreamController.isClosed) {
+            _centerCurrentLocationStreamController
+                .add(userLocationOptions.initialZoomLevel);
+          }
         });
       }
     }
