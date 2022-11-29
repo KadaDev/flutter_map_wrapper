@@ -108,6 +108,9 @@ class _MapStylePreview extends StatelessWidget {
           width: 4.0,
         ),
       ),
+      inkWell: InkWell(
+        onTap: onSelected,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -125,18 +128,15 @@ class _MapStylePreview extends StatelessWidget {
           ),
         ],
       ),
-      inkWell: InkWell(
-        onTap: onSelected,
-      ),
     );
   }
 
   Widget _previewImage(BuildContext context) {
-    final tileLayerOptions = mapStyle.tileLayerOptions(context);
+    final tileLayer = mapStyle.tileLayer(context);
 
-    final previewImage = const CachedTileProvider().getImage(
-      Coords(35613, 19593)..z = tileLayerOptions.retinaMode ? 15 : 16,
-      tileLayerOptions,
+    final previewImage = CachedTileProvider().getImage(
+      Coords(35613, 19593)..z = tileLayer.retinaMode ? 15 : 16,
+      tileLayer,
     );
     return Image(
       image: previewImage,

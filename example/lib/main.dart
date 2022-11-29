@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_wrapper/flutter_map_wrapper.dart';
@@ -64,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _getPermission();
+    if (Platform.isAndroid || Platform.isIOS) _getPermission();
   }
 
   static const List<MapStyle> mapStyles = [
@@ -73,11 +75,13 @@ class _MyHomePageState extends State<MyHomePage> {
       urlTemplate: '${MyHomePage.ifiskeMap}/{z}/{x}/{y}.png',
       maxZoom: 20,
       maxNativeZoom: 15,
+      userAgentPackageName: 'com.example.app',
     ),
     MapStyle(
       title: 'Open Street Map',
       urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       subdomains: ['a', 'b', 'c'],
+      userAgentPackageName: 'com.example.app',
     ),
   ];
 
@@ -119,11 +123,13 @@ class _MyHomePageState extends State<MyHomePage> {
       body: MapWidget<PointData, PolygonData>(
         mapStyles: mapStyles,
         center: LatLng(62.0, 15.0),
-        userLocationOptions: UserLocationOptions(
-          buttonZoomLevel: 15,
-          centerOnLocationUpdate: CenterOnLocationUpdate.once,
-          initialZoomLevel: 12,
-        ),
+        userLocationOptions: Platform.isMacOS
+            ? null
+            : UserLocationOptions(
+                buttonZoomLevel: 15,
+                centerOnLocationUpdate: CenterOnLocationUpdate.once,
+                initialZoomLevel: 12,
+              ),
         localizations: const FlutterMapWrapperLocalizations(),
         markers: MapMarkers(
           markers: points,

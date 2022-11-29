@@ -91,6 +91,7 @@ class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
 class MapWidgetState<PointDataType, PolygonDataType>
     extends State<MapWidget<PointDataType, PolygonDataType>> {
   final ValueNotifier<int> mapStyleIndex = ValueNotifier(0);
+
   MapStyle get selectedStyle => widget.mapStyles[mapStyleIndex.value];
 
   ValueNotifier<MapPoint<PointDataType>?> selectedPoint = ValueNotifier(null);
@@ -104,6 +105,8 @@ class MapWidgetState<PointDataType, PolygonDataType>
       const LocationMarkerDataStreamFactory()
           .geolocatorPositionStream()
           .asBroadcastStream();
+
+  late final MapController _mapController = MapController();
 
   @override
   void initState() {
@@ -157,10 +160,12 @@ class MapWidgetState<PointDataType, PolygonDataType>
     }
   }
 
-  void _onMapCreated(MapController controller) async {
-    await controller.onReady;
+  void _onMapCreated() async {
     widget.onSetZoom?.call(
-      CenterZoom(center: controller.center, zoom: controller.zoom),
+      CenterZoom(
+        center: _mapController.center,
+        zoom: _mapController.zoom,
+      ),
     );
   }
 
@@ -201,7 +206,7 @@ class MapWidgetState<PointDataType, PolygonDataType>
       bounds = null;
     }
     final mapOptions = MapOptions(
-      onMapCreated: _onMapCreated,
+      onMapReady: _onMapCreated,
       interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
       center: widget.center,
       zoom: initialZoom,
@@ -225,21 +230,16 @@ class MapWidgetState<PointDataType, PolygonDataType>
         child: Stack(
           children: [
             FlutterMap(
+              mapController: _mapController,
               options: mapOptions,
               children: [
-                TileLayerWidget(
-                  options: selectedStyle.tileLayerOptions(context),
-                ),
+                selectedStyle.tileLayer(context),
                 if (widget.userLocationOptions != null)
-                  LocationMarkerLayerWidget(
-                    plugin: LocationMarkerPlugin(
-                      centerCurrentLocationStream:
-                          _centerCurrentLocationStreamController.stream,
-                      centerOnLocationUpdate: _centerOnLocationUpdate,
-                    ),
-                    options: LocationMarkerLayerOptions(
-                      positionStream: positionStream,
-                    ),
+                  CurrentLocationLayer(
+                    centerCurrentLocationStream:
+                        _centerCurrentLocationStreamController.stream,
+                    centerOnLocationUpdate: _centerOnLocationUpdate,
+                    positionStream: positionStream,
                   ),
                 if (widget.polygons != null) widget.polygons!,
                 if (widget.markers != null) widget.markers!,

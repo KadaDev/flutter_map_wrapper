@@ -31,13 +31,13 @@ class MapPolygons<T> extends StatelessWidget {
       polygonMarkers = null;
     }
 
-    return GroupLayerWidget(
-      options: GroupLayerOptions(group: [
-        PolygonLayerOptions(
+    return Stack(
+      children: [
+        PolygonLayer(
           polygons: polygons,
         ),
-        if (polygonMarkers != null) MarkerLayerOptions(markers: polygonMarkers),
-      ]),
+        if (polygonMarkers != null) MarkerLayer(markers: polygonMarkers),
+      ],
     );
   }
 }

@@ -5,7 +5,7 @@ version: 0.0.1
 publish_to: none
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=2.18.0 <3.0.0"
   flutter: ">=3.0.0"
 
 dependencies:
@@ -13,20 +13,11 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_map:
-    git:
-      url: https://github.com/KadaDev/flutter_map.git
-      ref: master
-  flutter_map_location_marker:
-    git:
-      url: https://github.com/KadaDev/flutter_map_location_marker.git
-      ref: master
-  flutter_map_marker_cluster:
-    git:
-      url: https://github.com/KadaDev/flutter_map_marker_cluster.git
-      ref: master
+  flutter_map: ^3.0.0
+  flutter_map_location_marker: ^5.0.0
+  flutter_map_marker_cluster: ^1.0.1
   latlong2: ^0.8.1
-  geolocator: ^8.2.0
+  geolocator: ^9.0.1
 
 dev_dependencies:
   flutter_test:
