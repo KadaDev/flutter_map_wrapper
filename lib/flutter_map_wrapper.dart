@@ -14,4 +14,4 @@ export 'localizations.dart';
 
 export 'package:latlong2/latlong.dart' show LatLng;
 export 'package:flutter_map_location_marker/flutter_map_location_marker.dart'
-    show CenterOnLocationUpdate;
+    show FollowOnLocationUpdate;

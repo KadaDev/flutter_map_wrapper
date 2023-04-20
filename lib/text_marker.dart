@@ -11,9 +11,9 @@ Marker createTextMarker<T>({
 }) {
   final ThemeData theme = Theme.of(context);
 
-  final Color textColor = color ?? theme.textTheme.subtitle1!.color!;
+  final Color textColor = color ?? theme.textTheme.titleMedium!.color!;
 
-  final style = theme.textTheme.subtitle1!.copyWith(
+  final style = theme.textTheme.titleMedium!.copyWith(
     color: textColor,
   );
 

@@ -25,7 +25,7 @@ class MapClusterMarker extends StatelessWidget {
           ),
           child: Center(
             child: DefaultTextStyle(
-              style: theme.primaryTextTheme.bodyText2!,
+              style: theme.primaryTextTheme.bodyMedium!,
               child: child,
             ),
           ),

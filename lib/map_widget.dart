@@ -45,11 +45,11 @@ class UserLocationOptions {
   UserLocationOptions({
     this.buttonZoomLevel,
     this.initialZoomLevel,
-    this.centerOnLocationUpdate = CenterOnLocationUpdate.once,
+    this.followOnLocationUpdate = FollowOnLocationUpdate.once,
   });
   final double? buttonZoomLevel;
   final double? initialZoomLevel;
-  final CenterOnLocationUpdate centerOnLocationUpdate;
+  final FollowOnLocationUpdate followOnLocationUpdate;
 }
 
 class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
@@ -96,14 +96,14 @@ class MapWidgetState<PointDataType, PolygonDataType>
 
   ValueNotifier<MapPoint<PointDataType>?> selectedPoint = ValueNotifier(null);
 
-  CenterOnLocationUpdate _centerOnLocationUpdate = CenterOnLocationUpdate.never;
+  FollowOnLocationUpdate _followOnLocationUpdate = FollowOnLocationUpdate.never;
 
-  late final StreamController<double?> _centerCurrentLocationStreamController;
+  late final StreamController<double?> _followCurrentLocationStreamController;
   late final Stream<double?> stream;
 
-  late final Stream<LocationMarkerPosition> positionStream =
+  late final Stream<LocationMarkerPosition?> positionStream =
       const LocationMarkerDataStreamFactory()
-          .geolocatorPositionStream()
+          .fromGeolocatorPositionStream()
           .asBroadcastStream();
 
   late final MapController _mapController = MapController();
@@ -116,17 +116,17 @@ class MapWidgetState<PointDataType, PolygonDataType>
       setState(() {});
     });
 
-    _centerCurrentLocationStreamController = StreamController<double?>();
+    _followCurrentLocationStreamController = StreamController<double?>();
 
     final userLocationOptions = widget.userLocationOptions;
     if (userLocationOptions != null) {
-      _centerOnLocationUpdate = userLocationOptions.centerOnLocationUpdate;
+      _followOnLocationUpdate = userLocationOptions.followOnLocationUpdate;
 
-      if (_centerOnLocationUpdate == CenterOnLocationUpdate.always ||
-          _centerOnLocationUpdate == CenterOnLocationUpdate.once) {
+      if (_followOnLocationUpdate == FollowOnLocationUpdate.always ||
+          _followOnLocationUpdate == FollowOnLocationUpdate.once) {
         positionStream.first.then((value) {
-          if (!_centerCurrentLocationStreamController.isClosed) {
-            _centerCurrentLocationStreamController
+          if (!_followCurrentLocationStreamController.isClosed) {
+            _followCurrentLocationStreamController
                 .add(userLocationOptions.initialZoomLevel);
           }
         });
@@ -140,22 +140,22 @@ class MapWidgetState<PointDataType, PolygonDataType>
     super.didUpdateWidget(oldWidget);
     if (widget.userLocationOptions != oldWidget.userLocationOptions &&
         oldWidget.userLocationOptions == null) {
-      _centerOnLocationUpdate =
-          widget.userLocationOptions!.centerOnLocationUpdate;
+      _followOnLocationUpdate =
+          widget.userLocationOptions!.followOnLocationUpdate;
     }
   }
 
   @override
   void dispose() {
-    _centerCurrentLocationStreamController.close();
+    _followCurrentLocationStreamController.close();
     super.dispose();
   }
 
   void _onPositionChanged(MapPosition position, bool hasGesture) {
     // Stop centering the location marker on the map if user interacted with the map.
-    if (hasGesture && _centerOnLocationUpdate != CenterOnLocationUpdate.never) {
+    if (hasGesture && _followOnLocationUpdate != FollowOnLocationUpdate.never) {
       setState(() {
-        _centerOnLocationUpdate = CenterOnLocationUpdate.never;
+        _followOnLocationUpdate = FollowOnLocationUpdate.never;
       });
     }
   }
@@ -174,14 +174,14 @@ class MapWidgetState<PointDataType, PolygonDataType>
 
     // Automatically center the location marker on the map when
     // location updated until user interact with the map.
-    if (_centerOnLocationUpdate != CenterOnLocationUpdate.always) {
+    if (_followOnLocationUpdate != FollowOnLocationUpdate.always) {
       setState(() {
-        _centerOnLocationUpdate = CenterOnLocationUpdate.always;
+        _followOnLocationUpdate = FollowOnLocationUpdate.always;
       });
     }
     // Center the location marker on the map and zoom the map
     if (widget.userLocationOptions != null) {
-      _centerCurrentLocationStreamController.add(
+      _followCurrentLocationStreamController.add(
         widget.userLocationOptions!.buttonZoomLevel,
       );
     }
@@ -236,9 +236,9 @@ class MapWidgetState<PointDataType, PolygonDataType>
                 selectedStyle.tileLayer(context),
                 if (widget.userLocationOptions != null)
                   CurrentLocationLayer(
-                    centerCurrentLocationStream:
-                        _centerCurrentLocationStreamController.stream,
-                    centerOnLocationUpdate: _centerOnLocationUpdate,
+                    followCurrentLocationStream:
+                        _followCurrentLocationStreamController.stream,
+                    followOnLocationUpdate: _followOnLocationUpdate,
                     positionStream: positionStream,
                   ),
                 if (widget.polygons != null) widget.polygons!,
@@ -260,7 +260,7 @@ class MapWidgetState<PointDataType, PolygonDataType>
                   return child!;
                 },
                 child: _MapLocationButton(
-                  centerOnLocationUpdate: _centerOnLocationUpdate,
+                  followOnLocationUpdate: _followOnLocationUpdate,
                   onPressed: _onUserLocationButtonPressed,
                 ),
               ),
@@ -289,11 +289,11 @@ class MapWidgetState<PointDataType, PolygonDataType>
 class _MapLocationButton extends StatelessWidget {
   const _MapLocationButton({
     required this.onPressed,
-    required this.centerOnLocationUpdate,
+    required this.followOnLocationUpdate,
   });
   final VoidCallback onPressed;
 
-  final CenterOnLocationUpdate centerOnLocationUpdate;
+  final FollowOnLocationUpdate followOnLocationUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +317,7 @@ class _MapLocationButton extends StatelessWidget {
 
   IconData _getUserLocationFabIcon(BuildContext context) {
     // TODO: check for user geolocation permissions, if no permissions use gps_off
-    return centerOnLocationUpdate == CenterOnLocationUpdate.always
+    return followOnLocationUpdate == FollowOnLocationUpdate.always
         ? Icons.gps_fixed
         : Icons.gps_not_fixed;
   }

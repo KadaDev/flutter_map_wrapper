@@ -40,7 +40,7 @@ class DetailsPanel extends StatelessWidget {
                 ],
                 Expanded(
                   child: DefaultTextStyle(
-                    style: Theme.of(context).textTheme.headline6!,
+                    style: Theme.of(context).textTheme.titleLarge!,
                     child: title,
                   ),
                 ),
@@ -53,7 +53,7 @@ class DetailsPanel extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0).copyWith(top: 0.0),
             child: DefaultTextStyle(
-              style: Theme.of(context).textTheme.bodyText2!,
+              style: Theme.of(context).textTheme.bodyMedium!,
               child: content!,
             ),
           ),
@@ -62,24 +62,39 @@ class DetailsPanel extends StatelessWidget {
 
     final theme = Theme.of(context);
     final cardTheme = theme.cardTheme.copyWith(
-      margin: margin ?? theme.cardTheme.margin ?? const EdgeInsets.all(8.0),
       clipBehavior: Clip.antiAlias,
       shape: theme.cardTheme.shape ??
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
     );
+
+    EdgeInsetsGeometry margin =
+        this.margin ?? theme.cardTheme.margin ?? const EdgeInsets.all(8.0);
+    final mq = MediaQuery.of(context);
+    margin = margin.clamp(
+      mq.padding.copyWith(top: 0),
+      const EdgeInsets.all(double.infinity),
+    );
+
     return Theme(
       data: theme.copyWith(
         cardTheme: cardTheme,
       ),
       child: Card(
-        child: onTap != null
-            ? InkWell(
-                onTap: onTap,
-                child: cardContent,
-              )
-            : cardContent,
+        margin: margin,
+        child: MediaQuery.removePadding(
+          context: context,
+          removeBottom: true,
+          removeLeft: true,
+          removeRight: true,
+          child: onTap != null
+              ? InkWell(
+                  onTap: onTap,
+                  child: cardContent,
+                )
+              : cardContent,
+        ),
       ),
     );
   }

@@ -127,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ? null
             : UserLocationOptions(
                 buttonZoomLevel: 15,
-                centerOnLocationUpdate: CenterOnLocationUpdate.once,
+                followOnLocationUpdate: FollowOnLocationUpdate.once,
                 initialZoomLevel: 12,
               ),
         localizations: const FlutterMapWrapperLocalizations(),
