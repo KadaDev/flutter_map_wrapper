@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
 
   flutter_map: ^5.0.0
-  flutter_map_location_marker: ^5.0.0
+  flutter_map_location_marker: ^7.0.4
   # Using a version of flutter_map_marker_cluster with bugfixes
   flutter_map_marker_cluster:
     git:
