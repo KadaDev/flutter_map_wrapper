@@ -87,14 +87,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<MapPoint<PointData>> points = [
     MapPoint(
-      point: LatLng(62.4, 13.5),
+      point: const LatLng(62.4, 13.5),
       data: PointData(
         title: "Test marker 1",
         description: "Description 1",
       ),
     ),
     MapPoint(
-      point: LatLng(63.1, 16.2),
+      point: const LatLng(63.1, 16.2),
       data: PointData(
         title: "Test marker 2",
         description: "Description 2",
@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: MapWidget<PointData, PolygonData>(
         mapStyles: mapStyles,
-        center: LatLng(62.0, 15.0),
+        center: const LatLng(62.0, 15.0),
         userLocationOptions: Platform.isMacOS
             ? null
             : UserLocationOptions(

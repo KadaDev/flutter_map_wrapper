@@ -16,10 +16,10 @@ dependencies:
   flutter_map: ^5.0.0
   flutter_map_location_marker: ^7.0.4
   # Using a version of flutter_map_marker_cluster with bugfixes
-  flutter_map_marker_cluster:
-    git:
-      url: git@github.com:KadaDev/flutter_map_marker_cluster.git
-      ref: master
+  flutter_map_marker_cluster: ^1.2.0
+  #git:
+  #url: git@github.com:KadaDev/flutter_map_marker_cluster.git
+  #ref: master
   latlong2: ^0.9.0
   geolocator: ^9.0.1
 

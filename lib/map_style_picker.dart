@@ -135,7 +135,7 @@ class _MapStylePreview extends StatelessWidget {
     final tileLayer = mapStyle.tileLayer(context);
 
     final previewImage = CachedTileProvider().getImage(
-      Coords(35613, 19593)..z = tileLayer.retinaMode ? 15 : 16,
+      TileCoordinates(35613, 19593, tileLayer.retinaMode ? 15 : 16),
       tileLayer,
     );
     return Image(

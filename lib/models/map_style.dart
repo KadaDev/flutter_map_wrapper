@@ -16,7 +16,7 @@ class MapStyle {
 
   final String title;
   final String urlTemplate;
-  final double? maxNativeZoom;
+  final int? maxNativeZoom;
   final double? minZoom;
   final double? maxZoom;
   final List<String>? subdomains;
