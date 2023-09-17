@@ -137,10 +137,11 @@ packages:
   flutter_compass:
     dependency: transitive
     description:
-      name: flutter_compass
-      sha256: be642484f9f6975c1c6edff568281b001f2f1e604de27ecea18d97eebbdef22f
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: de5d53cd648cf76f968a5328db0f21319f438523
+      url: "https://github.com/KadaDev/flutter_compass"
+    source: git
     version: "0.8.0"
   flutter_lints:
     dependency: "direct dev"
@@ -161,10 +162,11 @@ packages:
   flutter_map_location_marker:
     dependency: transitive
     description:
-      name: flutter_map_location_marker
-      sha256: "84464cf16ddaf089dd35a2b2a5c4be3571799d6307f4a54a7d645ab958ff3132"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: "540001b4df828adeb0effc5e5ad0a4226a3ad494"
+      url: "https://github.com/KadaDev/flutter_map_location_marker"
+    source: git
     version: "7.0.5"
   flutter_map_marker_cluster:
     dependency: transitive

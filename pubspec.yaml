@@ -14,7 +14,12 @@ dependencies:
     sdk: flutter
 
   flutter_map: ^5.0.0
-  flutter_map_location_marker: ^7.0.4
+  # Need a fix for flutter_compass so need a forked version of flutter_map_location_marker too
+  # flutter_map_location_marker: ^7.0.4
+  flutter_map_location_marker:
+    git:
+      url: https://github.com/KadaDev/flutter_map_location_marker
+      ref: master
   # Using a version of flutter_map_marker_cluster with bugfixes
   flutter_map_marker_cluster: ^1.2.0
   #git:
