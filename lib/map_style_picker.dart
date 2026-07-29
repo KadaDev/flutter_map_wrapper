@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_wrapper/cached_tile_provider.dart';
@@ -97,7 +99,7 @@ class _MapStylePreview extends StatelessWidget {
     final BorderRadius borderRadius = BorderRadius.circular(8.0);
 
     return InkwellWrapper(
-      color: Theme.of(context).colorScheme.surfaceVariant,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       shape: RoundedRectangleBorder(
         borderRadius: borderRadius,
         side: BorderSide(
@@ -133,13 +135,14 @@ class _MapStylePreview extends StatelessWidget {
 
   Widget _previewImage(BuildContext context) {
     final tileLayer = mapStyle.tileLayer(context);
-
-    final previewImage = CachedTileProvider().getImage(
-      TileCoordinates(35613, 19593, tileLayer.retinaMode ? 15 : 16),
-      tileLayer,
-    );
+    final previewCoordinates =
+        // Need to subtract zoomOffset from the zoom level to get the correct tile coordinates for the preview image.
+        TileCoordinates(35613, 19593, 16 - tileLayer.zoomOffset.toInt());
     return Image(
-      image: previewImage,
+      image: CachedTileProvider().getImage(
+        previewCoordinates,
+        tileLayer,
+      ),
       fit: BoxFit.cover,
     );
   }

@@ -24,7 +24,7 @@ class MapPolygon<T> extends Polygon {
     super.borderStrokeWidth = defaultBorderStrokeWidth,
     super.holePointsList,
     super.disableHolesBorder,
-    super.isDotted,
+    super.pattern,
   }) : super(
           color: baseColor.withAlpha(colorAlpha),
           borderColor: baseColor.withAlpha(borderAlpha),
@@ -37,7 +37,7 @@ class MapPolygon<T> extends Polygon {
     super.borderStrokeWidth = defaultBorderStrokeWidth,
     super.holePointsList,
     super.disableHolesBorder,
-    super.isDotted,
+    super.pattern,
   }) : super(
           points: _getPoints(polygonString),
           color: baseColor.withAlpha(colorAlpha),

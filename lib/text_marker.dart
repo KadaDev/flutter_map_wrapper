@@ -33,26 +33,24 @@ Marker createTextMarker<T>({
     point: point,
     height: (size.height * 2) + padding.bottom + padding.top,
     width: (size.width * 2) + padding.left + padding.right,
-    anchorPos: AnchorPos.align(AnchorAlign.center),
-    builder: (context) {
-      return Center(
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-              color: textColor.contrastColor,
-            ),
-            child: Text(
-              text,
-              textAlign: TextAlign.center,
-              style: style,
-            ),
+    alignment: Alignment.center,
+    child: Center(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6),
+            color: textColor.contrastColor,
+          ),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: style,
           ),
         ),
-      );
-    },
+      ),
+    ),
   );
 }
 

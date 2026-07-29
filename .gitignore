@@ -35,4 +35,6 @@ build/
 .pub/
 
 # fvm
-.fvm/flutter_sdk
+
+# FVM Version Cache
+.fvm/

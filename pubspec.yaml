@@ -9,24 +9,15 @@ environment:
   flutter: ">=3.0.0"
 
 dependencies:
-  cached_network_image: ^3.2.0
   flutter:
     sdk: flutter
 
-  flutter_map: ^5.0.0
-  # Need a fix for flutter_compass so need a forked version of flutter_map_location_marker too
-  # flutter_map_location_marker: ^7.0.4
-  flutter_map_location_marker:
-    git:
-      url: https://github.com/KadaDev/flutter_map_location_marker
-      ref: master
-  # Using a version of flutter_map_marker_cluster with bugfixes
-  flutter_map_marker_cluster: ^1.2.0
-  #git:
-  #url: git@github.com:KadaDev/flutter_map_marker_cluster.git
-  #ref: master
-  latlong2: ^0.9.0
-  geolocator: ^10.0.1
+  cached_network_image: ^3.0.0
+  flutter_map_location_marker: ^10.0.0
+  flutter_map_marker_cluster: ^8.0.0
+  flutter_map: ^8.0.0
+  geolocator: ^14.0.0
+  latlong2: ">=0.9.1 <0.11.0"
 
 dev_dependencies:
   flutter_test:

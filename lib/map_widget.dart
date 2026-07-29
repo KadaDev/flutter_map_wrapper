@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -25,7 +26,7 @@ class ZoomSettings {
   final double minZoom;
   final bool constrainZoom;
 
-  setZoom() {
+  void setZoom() {
     if (constrainZoom) {
       /*
       minZoom = math.max(
@@ -45,11 +46,11 @@ class UserLocationOptions {
   UserLocationOptions({
     this.buttonZoomLevel,
     this.initialZoomLevel,
-    this.followOnLocationUpdate = FollowOnLocationUpdate.once,
+    this.alignOnUpdate = AlignOnUpdate.once,
   });
   final double? buttonZoomLevel;
   final double? initialZoomLevel;
-  final FollowOnLocationUpdate followOnLocationUpdate;
+  final AlignOnUpdate alignOnUpdate;
 }
 
 class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
@@ -58,7 +59,7 @@ class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
     super.key,
     required this.mapStyles,
     this.zoom = const ZoomSettings(),
-    this.center,
+    required this.center,
     this.onSetZoom,
     this.markers,
     this.polygons,
@@ -79,7 +80,7 @@ class MapWidget<PointDataType extends Object?, PolygonDataType extends Object?>
 
   final LatLng? center;
 
-  final void Function(CenterZoom)? onSetZoom;
+  final void Function(MapCamera)? onSetZoom;
 
   final Widget Function(BuildContext, MapPoint<PointDataType>)?
       detailsPanelBuilder;
@@ -96,9 +97,9 @@ class MapWidgetState<PointDataType, PolygonDataType>
 
   ValueNotifier<MapPoint<PointDataType>?> selectedPoint = ValueNotifier(null);
 
-  FollowOnLocationUpdate _followOnLocationUpdate = FollowOnLocationUpdate.never;
+  AlignOnUpdate _alignOnUpdate = AlignOnUpdate.never;
 
-  late final StreamController<double?> _followCurrentLocationStreamController;
+  late final StreamController<double?> _alignOnUpdateStreamController;
   late final Stream<double?> stream;
 
   late final Stream<LocationMarkerPosition?> positionStream =
@@ -116,17 +117,17 @@ class MapWidgetState<PointDataType, PolygonDataType>
       setState(() {});
     });
 
-    _followCurrentLocationStreamController = StreamController<double?>();
+    _alignOnUpdateStreamController = StreamController<double?>();
 
     final userLocationOptions = widget.userLocationOptions;
     if (userLocationOptions != null) {
-      _followOnLocationUpdate = userLocationOptions.followOnLocationUpdate;
+      _alignOnUpdate = userLocationOptions.alignOnUpdate;
 
-      if (_followOnLocationUpdate == FollowOnLocationUpdate.always ||
-          _followOnLocationUpdate == FollowOnLocationUpdate.once) {
+      if (_alignOnUpdate == AlignOnUpdate.always ||
+          _alignOnUpdate == AlignOnUpdate.once) {
         positionStream.first.then((value) {
-          if (!_followCurrentLocationStreamController.isClosed) {
-            _followCurrentLocationStreamController
+          if (!_alignOnUpdateStreamController.isClosed) {
+            _alignOnUpdateStreamController
                 .add(userLocationOptions.initialZoomLevel);
           }
         });
@@ -140,32 +141,28 @@ class MapWidgetState<PointDataType, PolygonDataType>
     super.didUpdateWidget(oldWidget);
     if (widget.userLocationOptions != oldWidget.userLocationOptions &&
         oldWidget.userLocationOptions == null) {
-      _followOnLocationUpdate =
-          widget.userLocationOptions!.followOnLocationUpdate;
+      _alignOnUpdate = widget.userLocationOptions!.alignOnUpdate;
     }
   }
 
   @override
   void dispose() {
-    _followCurrentLocationStreamController.close();
+    _alignOnUpdateStreamController.close();
     super.dispose();
   }
 
-  void _onPositionChanged(MapPosition position, bool hasGesture) {
+  void _onPositionChanged(MapCamera camera, bool hasGesture) {
     // Stop centering the location marker on the map if user interacted with the map.
-    if (hasGesture && _followOnLocationUpdate != FollowOnLocationUpdate.never) {
+    if (hasGesture && _alignOnUpdate != AlignOnUpdate.never) {
       setState(() {
-        _followOnLocationUpdate = FollowOnLocationUpdate.never;
+        _alignOnUpdate = AlignOnUpdate.never;
       });
     }
   }
 
   void _onMapCreated() async {
     widget.onSetZoom?.call(
-      CenterZoom(
-        center: _mapController.center,
-        zoom: _mapController.zoom,
-      ),
+      _mapController.camera,
     );
   }
 
@@ -174,14 +171,14 @@ class MapWidgetState<PointDataType, PolygonDataType>
 
     // Automatically center the location marker on the map when
     // location updated until user interact with the map.
-    if (_followOnLocationUpdate != FollowOnLocationUpdate.always) {
+    if (_alignOnUpdate != AlignOnUpdate.always) {
       setState(() {
-        _followOnLocationUpdate = FollowOnLocationUpdate.always;
+        _alignOnUpdate = AlignOnUpdate.always;
       });
     }
     // Center the location marker on the map and zoom the map
     if (widget.userLocationOptions != null) {
-      _followCurrentLocationStreamController.add(
+      _alignOnUpdateStreamController.add(
         widget.userLocationOptions!.buttonZoomLevel,
       );
     }
@@ -207,15 +204,18 @@ class MapWidgetState<PointDataType, PolygonDataType>
     }
     final mapOptions = MapOptions(
       onMapReady: _onMapCreated,
-      interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-      center: widget.center,
-      zoom: initialZoom,
-      minZoom: widget.zoom.minZoom,
-      maxZoom: widget.zoom.maxZoom,
-      bounds: bounds,
-      nePanBoundary: bounds?.northEast,
-      swPanBoundary: bounds?.southWest,
-      slideOnBoundaries: bounds != null,
+      interactionOptions: InteractionOptions(
+        flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+      ),
+      initialCenter: widget.center ?? bounds!.center,
+      initialZoom: initialZoom,
+      minZoom: math.max(
+          widget.zoom.minZoom, selectedStyle.tileLayer(context).minZoom),
+      maxZoom: math.min(
+          widget.zoom.maxZoom, selectedStyle.tileLayer(context).maxZoom),
+      cameraConstraint: bounds != null
+          ? CameraConstraint.contain(bounds: bounds)
+          : CameraConstraint.unconstrained(),
       onTap: (pos, latLng) {
         selectedPoint.value = null;
       },
@@ -236,9 +236,8 @@ class MapWidgetState<PointDataType, PolygonDataType>
                 selectedStyle.tileLayer(context),
                 if (widget.userLocationOptions != null)
                   CurrentLocationLayer(
-                    followCurrentLocationStream:
-                        _followCurrentLocationStreamController.stream,
-                    followOnLocationUpdate: _followOnLocationUpdate,
+                    alignPositionStream: _alignOnUpdateStreamController.stream,
+                    alignPositionOnUpdate: _alignOnUpdate,
                     positionStream: positionStream,
                   ),
                 if (widget.polygons != null) widget.polygons!,
@@ -260,7 +259,7 @@ class MapWidgetState<PointDataType, PolygonDataType>
                   return child!;
                 },
                 child: _MapLocationButton(
-                  followOnLocationUpdate: _followOnLocationUpdate,
+                  alignOnUpdate: _alignOnUpdate,
                   onPressed: _onUserLocationButtonPressed,
                 ),
               ),
@@ -289,11 +288,11 @@ class MapWidgetState<PointDataType, PolygonDataType>
 class _MapLocationButton extends StatelessWidget {
   const _MapLocationButton({
     required this.onPressed,
-    required this.followOnLocationUpdate,
+    required this.alignOnUpdate,
   });
   final VoidCallback onPressed;
 
-  final FollowOnLocationUpdate followOnLocationUpdate;
+  final AlignOnUpdate alignOnUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +316,7 @@ class _MapLocationButton extends StatelessWidget {
 
   IconData _getUserLocationFabIcon(BuildContext context) {
     // TODO: check for user geolocation permissions, if no permissions use gps_off
-    return followOnLocationUpdate == FollowOnLocationUpdate.always
+    return alignOnUpdate == AlignOnUpdate.always
         ? Icons.gps_fixed
         : Icons.gps_not_fixed;
   }

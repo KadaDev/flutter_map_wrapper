@@ -28,7 +28,7 @@ class MapStyle {
     return TileLayer(
       urlTemplate: urlTemplate,
       subdomains: subdomains ?? const <String>[],
-      maxNativeZoom: maxNativeZoom,
+      maxNativeZoom: maxNativeZoom ?? 19,
       retinaMode: supportsNativeRetinaMode ? false : useRetinaMode,
       tileProvider: CachedTileProvider(),
       additionalOptions: {

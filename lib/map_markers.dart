@@ -43,10 +43,8 @@ class MapMarkers<T> extends StatelessWidget {
       options: MarkerClusterLayerOptions(
         maxClusterRadius: maxClusterRadius,
         size: const Size(48, 48),
-        fitBoundsOptions: const FitBoundsOptions(
-          // How much padding to use when zooming to a tapped cluster
-          padding: EdgeInsets.all(24),
-        ),
+        // How much padding to use when zooming to a tapped cluster
+        padding: EdgeInsets.all(24),
         markers: markers.map((e) => _markerBuilder(e)).toList(),
         showPolygon: false,
         builder: (context, markers) {
@@ -83,12 +81,14 @@ class MapMarkers<T> extends StatelessWidget {
   Marker _markerBuilder(MapPoint<T> mp) {
     return Marker(
       point: mp,
-      anchorPos: AnchorPos.align(AnchorAlign.top),
+      alignment: Alignment.topCenter,
       height: markerSize,
       width: markerSize,
-      builder: (context) {
-        return markerBuilder(context, mp);
-      },
+      child: Builder(
+        builder: (context) {
+          return markerBuilder(context, mp);
+        },
+      ),
     );
   }
 }

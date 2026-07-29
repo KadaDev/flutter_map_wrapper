@@ -14,7 +14,7 @@ class MapClusterMarker extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: theme.colorScheme.primary.withOpacity(0.5),
+        color: theme.colorScheme.primary.withValues(alpha: 0.5),
       ),
       child: Padding(
         padding: const EdgeInsets.all(6.0),
