@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_map_wrapper/flutter_map_wrapper.dart';
 import 'package:flutter_map_wrapper/util/hex_to_color.dart';
 
